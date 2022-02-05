@@ -1,0 +1,118 @@
+from tkinter import *
+import random
+import time
+
+#time.sleep(0.01)
+count = 1
+class Ball:
+    def __init__(self, canvas, paddle, color):
+        self.canvas = canvas
+        self.paddle = paddle
+        self.id = canvas.create_oval(10, 10, 25, 25, fill = color)
+        self.canvas.move(self.id, 245, 100)
+        starts = [-3, -2, -1, 1, 2, 3]
+        random.shuffle(starts)
+        self.x = starts[0]
+        self.y = -3
+        #canvas.create_text(120, 70, text = "Loading...", fill = "red", font = ("Courier", 30))
+
+        
+        #canvas.create_text(120, 30, text = "Loading...", fill = "red", font = ("Courier", 30))
+
+        self.canvas_height = self.canvas.winfo_height()
+        self.canvas_width = self.canvas.winfo_width()
+        self.hit_bottom = False
+        time.sleep(1)
+        
+
+    def hit_paddle(self, pos):
+        paddle_pos = self.canvas.coords(self.paddle.id)
+        if pos[2] >= paddle_pos[0] and pos[0] <= paddle_pos[2]:
+            if pos[3] >= paddle_pos[1] and pos[3] <= paddle_pos[3]:
+                #count_score = count_score += 1
+                return True
+        
+        return False
+    
+        
+    def draw(self):
+        self.canvas.move(self.id, self.x, self.y)
+        pos = self.canvas.coords(self.id)
+        if pos[1] <= 0:
+            self.y = 3
+        if pos[3] >= self.canvas_height:
+            self.hit_bottom = True
+        if self.hit_paddle(pos) == True:
+            self.y = -3
+        if pos[0] <= 0:
+            self.x = 3
+        if pos[2] >= self.canvas_width:
+            self.x = -3
+
+        #time.sleep(0.01)
+        #print(self.canvas.coords(self.id))
+
+class Paddle:
+    def __init__(self, canvas, color):
+        self.canvas = canvas
+        self.id = canvas.create_rectangle(0, 0, 120, 10, fill = color)
+        self.canvas.move(self.id, 400, 350)
+        self.x = 0
+        self.canvas_width = self.canvas.winfo_width()
+        self.canvas.bind_all("<KeyPress-Left>", self.turn_left)
+        self.canvas.bind_all("<KeyPress-Right>", self.turn_right)
+        #self.canvas.bind_all("<Button-1>", self.click_left_mouse)
+
+    def draw(self):
+        self.canvas.move(self.id, self.x, 0)
+        pos = self.canvas.coords(self.id)
+        if pos[0] <= 0:
+            self.x = 0
+        elif pos[2] >= self.canvas_width:
+            self.x = 0
+    
+    def turn_left(self, evt):
+        self.x = -2
+
+    #def click_left_mouse(self, evt):
+     #   self.x = 1
+
+
+    def turn_right(self, evt):
+        self.x = 2 
+        
+
+tk = Tk()
+tk.title("Paddle Play - An ar1on-coded game!")
+tk.resizable(0, 0)
+tk.wm_attributes("-topmost", 1)
+canvas = Canvas(tk, width = 600, height = 500, bd = 0, highlightthickness = 0)
+canvas.create_text(100, 30, text = "Paddle Play", fill = "blue", font = ("Times", 20))
+
+canvas.pack()
+tk.update()
+
+paddle = Paddle(canvas, "white")
+ball = Ball(canvas, paddle, "brown")
+
+while 1:
+    if ball.hit_bottom == False:
+        ball.draw()
+        paddle.draw()
+
+        count = count + 1
+
+        #canvas.create_text(150, 70, text = "Your score is %s " int(%total_score), fill = "red", font = ("Courier", 30))
+
+        
+    else:
+        time.sleep(0.05)
+        canvas.create_text(275, 70, text = "Your score is %s " %count, fill = "yellow", font = ("Courier", 30))
+
+        canvas.create_text(300, 250, text = "Game Over!", fill = "green", font = ("Courier", 30))
+        #time = int(time.time())
+        #canvas.create_text(300, 250, text = "You played for %s seconds" %time, fill = "red", font = ("Courier", 30))
+
+    tk.update_idletasks()
+    tk.update()
+    time.sleep(0.008)
